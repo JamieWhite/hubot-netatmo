@@ -2,7 +2,7 @@
 #   Gets weather conditions from Netatmo Urban Weather Station.
 #
 # Dependencies:
-#   "netatmo": "1.0.0"
+#   "netatmo": "2.0.0"
 #
 # Configuration:
 #   HUBOT_NETATMO_CLIENT_ID
@@ -12,8 +12,7 @@
 #   HUBOT_NETATMO_DEVICE_ID
 #
 # Commands:
-#   hubot weather - Shows current weather conditions.
-#   hubot noise - Shows current weather conditions.
+#   hubot wimbledon weather - Shows current weather conditions.
 #
 # Author:
 #   ampledata
@@ -31,20 +30,21 @@ config =
 
 options =
   device_id: process.env.HUBOT_NETATMO_DEVICE_ID # "70:ee:50:03:98:4c"
+  module_id: process.env.HUBOT_NETATMO_OUTDOOR_MODULE_ID
   scale: "30min"
   type: [
     "Temperature"
-    "CO2"
+    #"CO2"
     "Humidity"
-    "Pressure"
-    "Noise"
+    #"Pressure"
+    #"Noise"
   ]
 
 
 module.exports = (robot) ->
   netatmo_api = undefined
 
-  robot.respond /(weather|noise)/i, (msg) ->
+  robot.respond /(wimbledon weather)/i, (msg) ->
     unless config.client_id
       msg.send "Please set the HUBOT_NETATMO_CLIENT_ID environment variable."
       return
@@ -66,4 +66,5 @@ module.exports = (robot) ->
 
 
     netatmo_api.getMeasure options, (err, measure) ->
-      return msg.send "Temperature #{measure[0]['value'][0][0]} CO2 #{measure[0]['value'][0][1]} Humidity #{measure[0]['value'][0][2]} Pressure #{measure[0]['value'][0][3]} Noise #{measure[0]['value'][0][4]}"
+      value = measure[..].pop()['value'][..].pop()
+      return msg.send "Temperature #{value[0]}°C, Humidity #{value[1]}%"
